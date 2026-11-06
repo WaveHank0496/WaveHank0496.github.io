@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="100%" r="90%">
+      <stop offset="0" stop-color="#ffd201"/>
+      <stop offset="0.6" stop-color="#ffd201"/>
+      <stop offset="1" stop-color="#ffd201"/>
+    </radialGradient>
+    <style>
+      rect.bar{rx:14px;stroke:#1a1a1a;stroke-width:5;transform-box:fill-box;transform-origin:bottom;animation:sort 4s ease-in-out infinite alternate}
+      .s{fill:#2d5db3}.u{fill:#fff6d6}
+      .t{font:600 30px -apple-system,'Segoe UI',sans-serif;fill:#1a1a1a;letter-spacing:3px;font-weight:800}
+      @keyframes sort{0%,20%{transform:scaleY(var(--a))}80%,100%{transform:scaleY(var(--b))}}
+      @media (prefers-reduced-motion:reduce){rect.bar{animation:none;transform:scaleY(var(--b))}}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <g transform="translate(250 180)">
+    <rect class="bar u" x="0"    y="0" width="72" height="620" style="--a:.55;--b:.1"/>
+    <rect class="bar u" x="100"  y="0" width="72" height="620" style="--a:.9;--b:.2"/>
+    <rect class="bar s" x="200"  y="0" width="72" height="620" style="--a:.3;--b:.3"/>
+    <rect class="bar u" x="300"  y="0" width="72" height="620" style="--a:.75;--b:.4"/>
+    <rect class="bar u" x="400"  y="0" width="72" height="620" style="--a:.15;--b:.5"/>
+    <rect class="bar s" x="500"  y="0" width="72" height="620" style="--a:.6;--b:.6"/>
+    <rect class="bar u" x="600"  y="0" width="72" height="620" style="--a:1;--b:.7"/>
+    <rect class="bar u" x="700"  y="0" width="72" height="620" style="--a:.4;--b:.8"/>
+    <rect class="bar u" x="800"  y="0" width="72" height="620" style="--a:.2;--b:.9"/>
+    <rect class="bar s" x="900"  y="0" width="72" height="620" style="--a:.85;--b:1"/>
+    <rect class="bar u" x="1000" y="0" width="72" height="620" style="--a:.45;--b:.95"/>
+  </g>
+  <text class="t" x="800" y="890" text-anchor="middle">BUBBLE · QUICK · MERGE · INSERTION · SELECTION · HEAP</text>
+</svg>

@@ -1,0 +1,97 @@
+export type Lang = 'zh' | 'en';
+
+export const ui = {
+  zh: {
+    htmlLang: 'zh-Hant-TW',
+    siteName: '梁敬翰 Hank Liang',
+    name: '梁敬翰',
+    nameAlt: 'Hank Liang',
+    school: '臺灣科技大學 資訊工程系',
+    schoolShort: '臺科大資工',
+    keywords: ['AI Agent', 'ML', 'CV', 'Cloud', 'Blockchain'],
+    proof: ['東澳集點網站', '數位排毒軟體', '金融股票 AI Agent'],
+    nav: { home: '首頁', projects: '專案', about: '關於我' },
+    switchLang: 'EN',
+    switchLangLabel: 'Switch to English',
+    themeLabel: '切換深色／淺色主題',
+    photoLabel: '點一下翻轉照片',
+    hero: { ctaProjects: '看專案', ctaAbout: '關於我' },
+    numbersTitle: '用數字看',
+    featured: '精選專案',
+    more: '更多作品',
+    viewAll: '全部專案 →',
+    countLine: (n: number) => `共 ${n} 個專案`,
+    tiers: { 1: '主打作品', 2: '其他作品', 3: '課程與練習' } as Record<number, string>,
+    tiersEn: { 1: 'Main', 2: 'More', 3: 'Practice' } as Record<number, string>,
+    projectsTitle: '專案',
+    projectsIntro: '依重要程度分成三層。私人 repo 的專案不附原始碼連結。',
+    detail: {
+      back: '← 回專案列表',
+      role: '我負責的部分',
+      highlights: '成果與重點',
+      stack: '技術',
+      challenges: '技術難點與解法',
+      problem: '難點',
+      solution: '解法',
+      links: '連結',
+      date: '時間',
+      private: '私人專案，原始碼不公開',
+    },
+    privateTag: '私人',
+    aboutTitle: '關於我',
+    footer: '以 Astro 建置的純靜態網站，沒有追蹤程式。',
+  },
+  en: {
+    htmlLang: 'en',
+    siteName: 'Hank Liang',
+    name: 'Hank Liang',
+    nameAlt: '梁敬翰',
+    school: 'CSIE, National Taiwan University of Science and Technology',
+    schoolShort: 'NTUST CSIE',
+    keywords: ['AI Agent', 'ML', 'CV', 'Cloud', 'Blockchain'],
+    proof: ['Dong’ao stamp-rally site', 'Digital-detox app', 'Stock-trading AI agent'],
+    nav: { home: 'Home', projects: 'Projects', about: 'About' },
+    switchLang: '中文',
+    switchLangLabel: '切換為中文',
+    themeLabel: 'Toggle dark / light theme',
+    photoLabel: 'Click to flip the photo',
+    hero: { ctaProjects: 'Projects', ctaAbout: 'About' },
+    numbersTitle: 'By the numbers',
+    featured: 'Featured',
+    more: 'More work',
+    viewAll: 'All projects →',
+    countLine: (n: number) => `${n} projects`,
+    tiers: { 1: 'Main Work', 2: 'More Work', 3: 'Coursework & Practice' } as Record<number, string>,
+    tiersEn: { 1: '', 2: '', 3: '' } as Record<number, string>,
+    projectsTitle: 'Projects',
+    projectsIntro: 'Grouped into three tiers. Projects in private repositories have no source link.',
+    detail: {
+      back: '← Back to projects',
+      role: 'My Role',
+      highlights: 'Results & Highlights',
+      stack: 'Tech Stack',
+      challenges: 'Challenges & Solutions',
+      problem: 'Challenge',
+      solution: 'Solution',
+      links: 'Links',
+      date: 'Date',
+      private: 'Private project; source code not public',
+    },
+    privateTag: 'Private',
+    aboutTitle: 'About',
+    footer: 'A static site built with Astro. No tracking scripts.',
+  },
+} as const;
+
+/** 依語言產生站內路徑：中文在根目錄，英文在 /en/ */
+export function path(lang: Lang, p: string = '/'): string {
+  const clean = p.startsWith('/') ? p : `/${p}`;
+  if (lang === 'zh') return clean;
+  return clean === '/' ? '/en/' : `/en${clean}`;
+}
+
+export const links = {
+  email: 'jimhankliang@gmail.com',
+  github: 'https://github.com/WaveHank0496',
+  linkedin: 'https://www.linkedin.com/in/hank-liang-0496jhk',
+};

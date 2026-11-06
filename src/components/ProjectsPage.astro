@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from './ProjectCard.astro';
+import { ui, type Lang } from '../i18n/ui';
+import { getProjects } from '../lib/projects';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+const projects = await getProjects();
+const colors = ['y', 'p', 'g'];
+const tiers = [1, 2, 3].map((tier) => ({
+  tier,
+  items: projects.filter((p) => p.data.tier === tier),
+}));
+---
+
+<Base lang={lang} route="/projects" title={t.projectsTitle}>
+  <section class="page-head">
+    <h1 class="page-title display">{t.projectsTitle}</h1>
+    <p class="lead">{t.countLine(projects.length)}・{t.projectsIntro}</p>
+    <nav class="jump" aria-label={t.projectsTitle}>
+      {
+        tiers.map(({ tier, items }) => (
+          <a href={`#tier-${tier}`} class:list={['chip', colors[tier - 1]]}>
+            {t.tiers[tier]} · {items.length}
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  {
+    tiers.map(({ tier, items }) => (
+      <section class="section tier" id={`tier-${tier}`}>
+        <div class="section-head reveal">
+          <h2 class="section-title" style={`background: var(--${['yellow', 'pink', 'green'][tier - 1]})`}>
+            {t.tiers[tier]}
+          </h2>
+        </div>
+        <div class:list={['grid', { top: tier === 1 }]}>
+          {items.map((p, i) => (
+            <ProjectCard project={p} lang={lang} size={tier === 1 && i === 0 ? 'wide' : tier === 1 ? 'large' : 'normal'} eager={tier === 1 && i === 0} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .page-head {
+    padding: 64px 0 8px;
+  }
+  .page-title {
+    margin: 0;
+    font-size: clamp(44px, 7vw, 72px);
+    line-height: 1.1;
+  }
+  .lead {
+    margin: 12px 0 0;
+    color: var(--text-soft);
+  }
+  .jump {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .jump .chip {
+    text-decoration: none;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .tier {
+    padding: 36px 0;
+    scroll-margin-top: 120px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .grid.top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid.top > :global(:first-child) {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 1200px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .page-head {
+      padding: 36px 0 4px;
+    }
+    .grid,
+    .grid.top {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+  }
+</style>

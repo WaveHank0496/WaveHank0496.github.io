@@ -1,0 +1,390 @@
+---
+import '@fontsource/noto-sans-tc/400.css';
+import '@fontsource/noto-sans-tc/700.css';
+import '@fontsource/noto-sans-tc/900.css';
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/archivo-black/400.css';
+import '../styles/global.css';
+import FlipPhoto from '../components/FlipPhoto.astro';
+import SocialIcons from '../components/SocialIcons.astro';
+import { ui, path, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** 不含語言前綴的路徑，用來產生另一語言的連結，例如 /projects/gesture-demo */
+  route: string;
+}
+
+const { lang, title, description, route } = Astro.props;
+const t = ui[lang];
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const pageTitle = title ? `${title}｜${t.siteName}` : t.siteName;
+const desc = description ?? `${t.name}｜${t.school}`;
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+const navItems = [
+  { href: path(lang, '/'), label: t.nav.home, color: 'y' },
+  { href: path(lang, '/projects'), label: t.nav.projects, color: 'p' },
+  { href: path(lang, '/about'), label: t.nav.about, color: 'g' },
+];
+const isActive = (href: string) => {
+  const h = href.replace(/\/$/, '') || '/';
+  if (h === '/' || h === '/en') return current === h;
+  return current === h || current.startsWith(h + '/');
+};
+const zh = lang === 'zh';
+---
+
+<!doctype html>
+<html lang={t.htmlLang} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" hreflang="zh-Hant" href={new URL(path('zh', route), Astro.site)} />
+    <link rel="alternate" hreflang="en" href={new URL(path('en', route), Astro.site)} />
+    <script is:inline>
+      // 主題偏好只存在這台裝置的瀏覽器，不送出任何資料
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        var theme = 'dark';
+        try {
+          var saved = localStorage.getItem('site-theme-v2');
+          if (saved === 'light' || saved === 'dark') theme = saved;
+        } catch (e) {}
+        root.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{zh ? '跳到主要內容' : 'Skip to content'}</a>
+    <div class="shell">
+      <aside class="side">
+        <div class="me">
+          <FlipPhoto size={128} label={t.photoLabel} alt={t.name} altBack={zh ? '打哈欠的梁敬翰' : 'Hank yawning'} />
+          <div class="me-text">
+            <a class="me-name" href={path(lang, '/')}>{t.name}</a>
+            <span class="me-alt">{t.nameAlt}</span>
+          </div>
+        </div>
+        <p class="me-school">{t.school}</p>
+
+        <nav class="nav" aria-label="Main">
+          {
+            navItems.map((n) => (
+              <a href={n.href} class:list={['nav-link', n.color, { active: isActive(n.href) }]}>
+                {n.label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <SocialIcons class="side-social" />
+
+        <div class="toggles">
+          <button class="pill theme-toggle" type="button" aria-label={t.themeLabel} title={t.themeLabel}>
+            <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+            <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </button>
+          <a class="pill" href={path(other, route)} hreflang={other === 'zh' ? 'zh-Hant' : 'en'} aria-label={t.switchLangLabel}>
+            {t.switchLang}
+          </a>
+        </div>
+      </aside>
+
+      <div class="content">
+        <main id="main">
+          <slot />
+        </main>
+        <footer class="site-footer">
+          <span>© 2026 {t.siteName}</span>
+          <span class="muted">{t.footer}</span>
+        </footer>
+      </div>
+    </div>
+
+    <script is:inline>
+      (function () {
+        var btn = document.querySelector('.theme-toggle');
+        if (btn) {
+          btn.addEventListener('click', function () {
+            var root = document.documentElement;
+            var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('site-theme-v2', next); } catch (e) {}
+          });
+        }
+        var els = document.querySelectorAll('.reveal');
+        if (!('IntersectionObserver' in window)) {
+          els.forEach(function (el) { el.classList.add('in'); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+          });
+        }, { rootMargin: '0px 0px -6% 0px' });
+        els.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+  }
+  .skip:focus {
+    left: 16px;
+    top: 16px;
+    z-index: 100;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 26px 26px;
+    background: var(--side-bg);
+    color: var(--side-text);
+    border-right: 3px solid var(--ink);
+    overflow-y: auto;
+  }
+  .me {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .me-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .me-name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 30px;
+    text-decoration: none;
+  }
+  .me-alt {
+    margin-top: 6px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+  }
+  .me-school {
+    margin: 14px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.9;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  .nav-link {
+    display: block;
+    padding: 9px 18px;
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+  }
+  .nav-link:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .nav-link.active.y { background: var(--yellow); }
+  .nav-link.active.p { background: var(--pink); }
+  .nav-link.active.g { background: var(--green); }
+  .nav-link.active::before {
+    content: '▶ ';
+    font-size: 11px;
+    vertical-align: 2px;
+  }
+
+  .side :global(.side-social) {
+    margin-top: 26px;
+  }
+  .side :global(.s-btn) {
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .toggles {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 2.5px solid var(--ink);
+    background: var(--cream);
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .pill:hover {
+    background: var(--yellow);
+  }
+  .icon-sun {
+    display: none;
+  }
+  :global([data-theme='dark']) .icon-sun {
+    display: inline;
+  }
+  :global([data-theme='dark']) .icon-moon {
+    display: none;
+  }
+
+  .content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+  .site-footer {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 48px 36px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    border-top: 2.5px dashed var(--soft-line);
+  }
+  .muted {
+    color: var(--muted);
+  }
+
+  @media (max-width: 1023px) {
+    .shell {
+      display: block;
+    }
+    .side {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'me toggles'
+        'nav nav';
+      align-items: center;
+      gap: 10px 12px;
+      padding: 10px 16px 12px;
+      border-right: 0;
+      border-bottom: 3px solid var(--ink);
+      overflow: visible;
+    }
+    .me {
+      grid-area: me;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+    .me :global(.flip) {
+      width: 42px !important;
+      height: 42px !important;
+    }
+    .me-name {
+      font-size: 20px;
+    }
+    .me-alt,
+    .me-school,
+    .side :global(.side-social) {
+      display: none;
+    }
+    .toggles {
+      grid-area: toggles;
+      margin: 0;
+      padding: 0;
+      gap: 8px;
+    }
+    .pill {
+      height: 34px;
+      min-width: 40px;
+      padding: 0 10px;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+    .nav {
+      grid-area: nav;
+      flex-direction: row;
+      margin: 0;
+      gap: 8px;
+    }
+    .nav-link {
+      flex: 1;
+      text-align: center;
+      padding: 5px 4px;
+      font-size: 15px;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+    .nav-link.active::before {
+      content: '';
+    }
+    main {
+      padding: 0 28px;
+    }
+    .site-footer {
+      padding: 24px 28px 32px;
+    }
+  }
+  @media (max-width: 640px) {
+    main {
+      padding: 0 16px;
+    }
+    .site-footer {
+      padding: 22px 16px 28px;
+    }
+  }
+</style>

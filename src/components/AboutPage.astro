@@ -1,0 +1,262 @@
+---
+import Base from '../layouts/Base.astro';
+import FlipPhoto from './FlipPhoto.astro';
+import { ui, links, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+const zh = lang === 'zh';
+
+// 研究、漢陽工作坊、資安社、釣魚郵件分析、做事原則、營隊細節已移到 /_保留內容，先不公開
+const contacts = [
+  { label: 'Email', value: links.email, href: `mailto:${links.email}`, c: 'y' },
+  { label: 'GitHub', value: 'WaveHank0496', href: links.github, c: 'p' },
+  { label: 'LinkedIn', value: 'Hank Liang', href: links.linkedin, c: 'g' },
+];
+
+const skills = [
+  { k: 'AI Agent', v: ['Gemini API', zh ? '輸出驗證與保底' : 'Output validation & fallbacks'] },
+  { k: 'ML / CV', v: ['PyTorch', 'MediaPipe', 'OpenCV', 'scikit-learn'] },
+  { k: 'Cloud', v: ['Google Cloud Run', 'Cloud Scheduler', 'Cloudflare Workers', 'FastAPI'] },
+  { k: zh ? '語言' : 'Languages', v: ['Python', 'Kotlin', 'JavaScript', 'C++', 'C#'] },
+  { k: 'App / Game', v: ['Android (Jetpack Compose)', 'Unity'] },
+  { k: zh ? '資安' : 'Security', v: ['Bandit', 'TryHackMe', 'Burp Suite', 'Natas'] },
+];
+---
+
+<Base lang={lang} route="/about" title={t.aboutTitle}>
+  <section class="head">
+    <FlipPhoto size={168} label={t.photoLabel} alt={t.name} altBack={zh ? '打哈欠的梁敬翰' : 'Hank yawning'} />
+    <div>
+      <span class="chip y">{t.aboutTitle}</span>
+      <h1 class="name display">{t.name}<span class="alt">{t.nameAlt}</span></h1>
+      <p class="school">{t.school}</p>
+      <p class="hint">{zh ? '點照片會翻面 ↺' : 'Click the photo ↺'}</p>
+    </div>
+  </section>
+
+  <section class="block reveal">
+    <h2 class="h2">{zh ? '聯絡' : 'Contact'}</h2>
+    <ul class="contacts">
+      {
+        contacts.map((c) => (
+          <li>
+            <a class={c.c} href={c.href} {...(c.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+              <span class="c-label">{c.label}</span>
+              <span class="c-value">{c.value}</span>
+              <span class="c-arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block reveal two">
+    <div>
+      <h2 class="h2">{zh ? '學歷' : 'Education'}</h2>
+      <div class="card">
+        <h3 class="item-head">{zh ? '國立臺灣科技大學' : 'National Taiwan University of Science and Technology'}</h3>
+        <p class="sub">{zh ? '資訊工程系 學士班' : 'B.S., Computer Science and Information Engineering'}</p>
+      </div>
+    </div>
+    <div>
+      <h2 class="h2">{zh ? '社團' : 'Club'}</h2>
+      <div class="card">
+        <h3 class="item-head">{zh ? '區塊鏈研究社' : 'Blockchain Club'}</h3>
+        <p class="sub">{zh ? '秘書' : 'Secretary'}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block reveal">
+    <h2 class="h2">{zh ? '技能' : 'Skills'}</h2>
+    <dl class="card skills">
+      {
+        skills.map((s) => (
+          <div class="skill-row">
+            <dt>{s.k}</dt>
+            <dd class="tags">
+              {s.v.map((x) => (
+                <span class="tag">{x}</span>
+              ))}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</Base>
+
+<style>
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    padding: 64px 0 8px;
+  }
+  .name {
+    margin: 14px 0 0;
+    font-size: clamp(40px, 5.6vw, 64px);
+    line-height: 1.1;
+  }
+  .alt {
+    display: inline-block;
+    margin-left: 14px;
+    font-size: 0.4em;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  .school {
+    margin: 10px 0 0;
+    font-weight: 700;
+    color: var(--text-soft);
+  }
+  .hint {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .block {
+    margin-top: 44px;
+  }
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .h2 {
+    display: inline-block;
+    margin: 0 0 16px;
+    padding: 6px 20px;
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--ink);
+    box-shadow: var(--hard-sm);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(18px, 2.2vw, 22px);
+  }
+  .contacts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .contacts a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow: var(--hard);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .contacts a:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .contacts .y { background: var(--yellow); }
+  .contacts .p { background: var(--pink); }
+  .contacts .g { background: var(--green); }
+  .c-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .c-value {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    word-break: break-all;
+  }
+  .c-arrow {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-weight: 900;
+  }
+  .card {
+    margin: 0;
+    padding: 20px 24px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .item-head {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 18px;
+  }
+  .sub {
+    margin: 4px 0 0;
+    color: var(--text-soft);
+  }
+  .skills {
+    display: grid;
+    gap: 14px;
+  }
+  .skill-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .skill-row dt {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 15px;
+  }
+  .skill-row dd {
+    margin: 0;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  @media (max-width: 860px) {
+    .contacts,
+    .two {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 36px 0 4px;
+    }
+    .head :global(.flip) {
+      width: 128px !important;
+      height: 128px !important;
+    }
+    .card {
+      padding: 16px 18px;
+    }
+    .skill-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .contacts a,
+    .contacts a:hover {
+      transition: none;
+      transform: none;
+    }
+  }
+</style>

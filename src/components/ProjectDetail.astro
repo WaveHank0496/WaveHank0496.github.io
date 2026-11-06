@@ -1,0 +1,309 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { ui, path, type Lang } from '../i18n/ui';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  lang: Lang;
+}
+const { project, lang } = Astro.props;
+const d = project.data;
+const t = ui[lang];
+---
+
+<Base lang={lang} route={`/projects/${project.id}`} title={d.title[lang]} description={d.summary[lang]}>
+  <article>
+    <header class="head">
+      <a class="back" href={path(lang, '/projects')}>{t.detail.back}</a>
+      <p class="chip y tier">{t.tiers[d.tier]}{d.status && ` · ${d.status[lang]}`}</p>
+      <h1 class="title display">{d.title[lang]}</h1>
+      <p class="summary">{d.summary[lang]}</p>
+      {
+        d.links.length > 0 && (
+          <div class="actions">
+            {d.links.map((l, i) => (
+              <a class:list={['btn', i === 0 ? 'btn-accent' : 'btn-ghost']} href={l.url} rel="noopener noreferrer" target="_blank">
+                {l.label[lang]} ↗
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <figure class="hero-img">
+      <img src={d.cover} alt="" width="1600" height="1000" loading="eager" />
+    </figure>
+
+    <dl class="meta reveal">
+      <div class="meta-item">
+        <dt>{t.detail.date}</dt>
+        <dd>{d.date[lang]}</dd>
+      </div>
+      <div class="meta-item wide">
+        <dt>{t.detail.stack}</dt>
+        <dd class="tags">{d.stack.map((s) => <span class="tag">{s}</span>)}</dd>
+      </div>
+      <div class="meta-item">
+        <dt>{t.detail.links}</dt>
+        <dd>
+          {
+            d.links.length > 0 ? (
+              d.links.map((l) => (
+                <a class="meta-link" href={l.url} rel="noopener noreferrer" target="_blank">
+                  {l.label[lang]} ↗
+                </a>
+              ))
+            ) : (
+              <span class="muted">{t.detail.private}</span>
+            )
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <section class="block reveal">
+      <h2 class="h2">{t.detail.role}</h2>
+      <ul class="list">{d.role[lang].map((r) => <li>{r}</li>)}</ul>
+    </section>
+
+    {
+      d.highlights && (
+        <section class="block reveal">
+          <h2 class="h2">{t.detail.highlights}</h2>
+          <ul class="list">
+            {d.highlights[lang].map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="block">
+      <h2 class="h2 reveal">{t.detail.challenges}</h2>
+      <ol class="challenges">
+        {
+          d.challenges.map((c, i) => (
+            <li class="challenge reveal">
+              <span class="cnum">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <p class="clabel">{t.detail.problem}</p>
+                <p class="problem">{c.problem[lang]}</p>
+                <p class="clabel hl">{t.detail.solution}</p>
+                <p class="solution">{c.solution[lang]}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .head {
+    padding: 48px 0 28px;
+    max-width: 860px;
+  }
+  .back {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .back:hover {
+    color: var(--accent-text);
+  }
+  .tier {
+    margin: 24px 0 0;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .title {
+    margin: 16px 0 0;
+    font-size: clamp(30px, 4.6vw, 52px);
+    line-height: 1.15;
+  }
+  .summary {
+    font-size: clamp(16px, 1.6vw, 19px);
+    color: var(--text-soft);
+    margin: 18px 0 0;
+    line-height: 1.75;
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 26px;
+  }
+  .hero-img {
+    margin: 0;
+    border: 3px solid var(--ink);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 8px 8px 0 var(--ink);
+    background: var(--cover-bg);
+  }
+  .hero-img img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.3fr;
+    gap: 16px;
+    margin: 28px 0 0;
+  }
+  .meta-item {
+    padding: 16px 18px;
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .meta-item dt {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .meta-item dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .meta-link {
+    display: block;
+    color: var(--accent-text);
+    font-weight: 700;
+  }
+  .muted {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .block {
+    margin-top: 48px;
+  }
+  .h2 {
+    display: inline-block;
+    margin: 0 0 16px;
+    padding: 6px 20px;
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--pink);
+    color: var(--ink);
+    box-shadow: var(--hard-sm);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(18px, 2.2vw, 22px);
+  }
+  .list {
+    margin: 0;
+    padding: 22px 26px 22px 46px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .list li {
+    margin: 6px 0;
+    color: var(--text-soft);
+  }
+  .list li::marker {
+    color: var(--blue);
+    font-weight: 900;
+  }
+  .challenges {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+  }
+  .challenge {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 12px;
+    padding: 24px 26px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .cnum {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--yellow);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 20px;
+  }
+  .clabel {
+    display: inline-block;
+    margin: 0;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--ink);
+    background: var(--pink);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .clabel.hl {
+    background: var(--green);
+  }
+  .problem {
+    margin: 6px 0 14px;
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .solution {
+    margin: 6px 0 0;
+    color: var(--text-soft);
+  }
+  @media (max-width: 860px) {
+    .meta {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .head {
+      padding: 32px 0 22px;
+    }
+    .hero-img {
+      border-radius: 20px;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    .list {
+      padding: 16px 16px 16px 34px;
+    }
+    .challenge {
+      grid-template-columns: 1fr;
+      padding: 18px;
+      gap: 10px;
+    }
+    .cnum {
+      width: 44px;
+      height: 44px;
+      font-size: 16px;
+    }
+    .actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

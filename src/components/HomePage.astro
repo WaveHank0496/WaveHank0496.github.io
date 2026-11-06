@@ -1,0 +1,382 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from './ProjectCard.astro';
+import SocialIcons from './SocialIcons.astro';
+import { ui, path, type Lang } from '../i18n/ui';
+import { getProjects } from '../lib/projects';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+const zh = lang === 'zh';
+const all = await getProjects();
+const featured = all.filter((p) => p.data.featured).slice(0, 3);
+const rest = all.filter((p) => !featured.includes(p));
+const chipColors = ['y', 'p', 'g', 'b', 'w'];
+const tickerWords = ['AI AGENT', 'MACHINE LEARNING', 'COMPUTER VISION', 'CLOUD', 'BLOCKCHAIN', 'ANDROID', 'UNITY'];
+// 重複兩次，確保一段的寬度一定超過容器，循環時不會露出空白
+const ticker = [...tickerWords, ...tickerWords];
+
+const numbers = [
+  {
+    n: '1,657',
+    unit: zh ? '次瀏覽' : 'views',
+    sub: zh ? '420 人次參與集點・10 家在地商家' : '420 participations · 10 local shops',
+    project: zh ? '東澳集點系統' : 'Dong’ao Stamp Rally',
+    id: 'eia-stamp-rally',
+    c: 'y',
+  },
+  {
+    n: '95.73%',
+    unit: zh ? '測試準確率' : 'test accuracy',
+    sub: zh ? '15 類手勢・33,809 筆自錄資料' : '15 classes · 33,809 self-recorded samples',
+    project: 'Gesture Demo',
+    id: 'gesture-demo',
+    c: 'p',
+  },
+  {
+    n: '231',
+    unit: zh ? '個單元測試' : 'unit tests',
+    sub: zh ? '約 7,500 行 Kotlin・不需網路權限' : '~7,500 lines of Kotlin · no network permission',
+    project: zh ? '麥勾滑' : 'mindgohua',
+    id: 'mindgohua',
+    c: 'g',
+  },
+  {
+    n: '150',
+    unit: zh ? '檔股票每天分析' : 'stocks analyzed daily',
+    sub: zh ? '每天 2 輪自動繳交・失敗自動重試最多 4 次' : '2 automated runs a day · up to 4 automatic retries',
+    project: zh ? '玉山 Agent 基金經理人' : 'E.SUN Agent Fund Manager',
+    id: 'esun-agent',
+    c: 'b',
+  },
+  {
+    n: '0.73→0.97',
+    unit: 'F1',
+    sub: zh ? '依混淆矩陣補錄資料後' : 'after targeted re-recording',
+    project: 'Gesture Demo',
+    id: 'gesture-demo',
+    c: 'w',
+  },
+  {
+    n: String(all.length),
+    unit: zh ? '個專案' : 'projects',
+    sub: zh ? '2025–2026・3 個主打' : '2025–2026 · 3 featured',
+    project: zh ? '全部專案' : 'All projects',
+    id: '',
+    c: 'w',
+  },
+];
+---
+
+<Base lang={lang} route="/">
+  <section class="hero">
+    <div class="hero-card">
+      <span class="chip">{t.schoolShort}</span>
+      <h1 class="headline display">
+        <span class="hl zh-name">梁敬翰</span>
+        <span class="hl en-name">Hank Liang</span>
+      </h1>
+      <ul class="proof">
+        {t.proof.map((p) => <li>{p}</li>)}
+      </ul>
+      <div class="chips">
+        {t.keywords.map((k, i) => <span class:list={['chip', chipColors[i % chipColors.length]]}>{k}</span>)}
+      </div>
+      <div class="actions">
+        <a class="btn btn-accent" href="#featured">{t.hero.ctaProjects} ↓</a>
+        <a class="btn" href={path(lang, '/about')}>{t.hero.ctaAbout}</a>
+        <SocialIcons size={18} class="hero-social" />
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+    <div class="track">
+      {[0, 1].map(() => (
+        <span class="seq">
+          {ticker.map((w) => (
+            <>
+              <span>{w}</span>
+              <span class="arrow">▶</span>
+            </>
+          ))}
+        </span>
+      ))}
+    </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head reveal">
+      <h2 class="section-title">{t.numbersTitle}{zh && <small>By the numbers</small>}</h2>
+    </div>
+    <div class="numbers">
+      {
+        numbers.map((x) => (
+          <a class:list={['num-card', 'reveal', x.c]} href={path(lang, x.id ? `/projects/${x.id}` : '/projects')}>
+            <span class="num-big display">{x.n}</span>
+            <span class="num-unit">{x.unit}</span>
+            <span class="num-sub">{x.sub}</span>
+            <span class="num-proj">{x.project} →</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section" id="featured">
+    <div class="section-head reveal">
+      <h2 class="section-title">{t.featured}{zh && <small>Featured</small>}</h2>
+    </div>
+    <div class="featured">
+      {featured.map((p, i) => <ProjectCard project={p} lang={lang} size={i === 0 ? 'wide' : 'large'} eager={i === 0} />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head reveal">
+      <h2 class="section-title">{t.more}<small>{t.countLine(all.length)}</small></h2>
+      <a class="link-more" href={path(lang, '/projects')}>{t.viewAll}</a>
+    </div>
+    <div class="grid">
+      {rest.map((p) => <ProjectCard project={p} lang={lang} />)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding: 56px 0 28px;
+  }
+  .hero-card {
+    position: relative;
+    padding: 44px 48px 40px;
+    border: 3px solid var(--ink);
+    border-radius: 32px;
+    background: var(--surface);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .headline {
+    margin: 22px 0 0;
+    font-size: clamp(44px, 6.6vw, 84px);
+    line-height: 1.08;
+  }
+  .hl {
+    display: block;
+  }
+  /* 深色（預設）：中文名米白、英文名黃色 */
+  .zh-name {
+    color: var(--cream);
+  }
+  .en-name {
+    color: var(--yellow);
+  }
+  /* 淺色：底是白的，改用黑與藍 */
+  :global([data-theme='light']) .zh-name {
+    color: var(--ink);
+  }
+  :global([data-theme='light']) .en-name {
+    color: var(--blue);
+  }
+  .proof {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin: 24px 0 0;
+    padding: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-soft);
+  }
+  .proof li::before {
+    content: '✔ ';
+    color: var(--green);
+    font-weight: 900;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+  }
+  .chips .chip {
+    font-size: 15px;
+    padding: 6px 18px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  .actions :global(.hero-social) {
+    margin-left: auto;
+  }
+  @media (min-width: 1024px) {
+    .actions :global(.hero-social) {
+      display: none;
+    }
+  }
+
+  /* 跑馬燈 */
+  .ticker {
+    margin: 24px 0 0;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--ink);
+    box-shadow: var(--hard-sm);
+  }
+  .ticker-inner {
+    overflow: hidden;
+    margin: 0 18px;
+    /* 右端淡出，避免字被硬切成半截（例如只露出 AN） */
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent 100%);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent 100%);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: marquee 40s linear infinite;
+  }
+  .seq {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 9px 18px 9px 0;
+    font-family: var(--font-display);
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .arrow {
+    color: var(--blue);
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .num-card {
+    display: flex;
+    flex-direction: column;
+    padding: 22px 22px 18px;
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    background: #ffffff;
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow: var(--hard);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .num-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .num-card.y { background: var(--yellow); }
+  .num-card.p { background: var(--pink); }
+  .num-card.g { background: var(--green); }
+  .num-card.b { background: var(--blue); color: #ffffff; }
+  .num-card.w { background: #ffffff; }
+  :global([data-theme='dark']) .num-card.w {
+    background: var(--cream);
+  }
+  .num-big {
+    font-size: clamp(30px, 3.4vw, 42px);
+    line-height: 1.1;
+  }
+  .num-unit {
+    margin-top: 4px;
+    font-weight: 700;
+  }
+  .num-sub {
+    margin-top: 4px;
+    font-size: 14px;
+    opacity: 0.85;
+    flex: 1;
+  }
+  .num-proj {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 2px dashed currentColor;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .featured > :global(:first-child) {
+    grid-column: 1 / -1;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  @media (max-width: 1200px) {
+    .grid,
+    .numbers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .hero {
+      padding: 28px 0 16px;
+    }
+    .hero-card {
+      padding: 26px 20px 24px;
+      border-radius: 24px;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    .actions :global(.hero-social) {
+      margin-left: 0;
+    }
+    .featured,
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .numbers {
+      gap: 12px;
+    }
+    .num-card {
+      padding: 16px 14px 14px;
+      border-radius: 20px;
+    }
+    .num-sub {
+      font-size: 12.5px;
+    }
+    .num-big {
+      font-size: 24px;
+      overflow-wrap: anywhere;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track {
+      animation: none;
+    }
+    .num-card,
+    .num-card:hover {
+      transition: none;
+      transform: none;
+    }
+  }
+</style>
