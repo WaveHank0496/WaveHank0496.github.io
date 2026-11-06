@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 捲浪：藍色浪身、淺藍內側、白色浪花，底下一條海面 -->
+  <path d="M4 50 C10 30 22 14 38 12 C50 10 58 18 58 26 C58 33 52 36 47 33 C43 31 44 25 48 24 C44 20 36 22 32 30 C28 38 30 46 38 50 Z"
+        fill="#2d7fd3" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M32 30 C36 22 44 20 48 24 C44 25 43 31 47 33 C40 34 34 32 32 30 Z" fill="#8fd0ff"/>
+  <path d="M38 12 C50 10 58 18 58 26 C58 33 52 36 47 33" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <path d="M2 54 C10 50 16 50 22 54 C28 58 34 58 40 54 C46 50 52 50 62 54 L62 62 L2 62 Z"
+        fill="#2d5db3" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M8 56 C12 54 16 54 20 56" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

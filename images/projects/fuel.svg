@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="bg" cx="40%" cy="60%" r="80%">
+      <stop offset="0" stop-color="#fe8aa3"/>
+      <stop offset="0.6" stop-color="#fe8aa3"/>
+      <stop offset="1" stop-color="#fe8aa3"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffb000"/>
+      <stop offset="1" stop-color="#ffe066"/>
+    </linearGradient>
+    <style>
+      .flame{transform-origin:520px 760px;animation:flick 1.6s ease-in-out infinite alternate}
+      .t{font:600 34px -apple-system,'Segoe UI',sans-serif;fill:#1a1a1a}
+      .m{font:500 28px -apple-system,'Segoe UI',sans-serif;fill:#1a1a1a}
+      .ok{animation:pop 3s ease-in-out infinite}
+      @keyframes flick{from{transform:scale(1,1)}to{transform:scale(1.05,1.12)}}
+      @keyframes pop{0%,40%{opacity:0}55%,100%{opacity:1}}
+      @media (prefers-reduced-motion:reduce){.flame,.ok{animation:none}}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <!-- 火焰 -->
+  <path class="flame" stroke="#1a1a1a" stroke-width="7" d="M520 260 C600 380 700 460 680 600 C665 710 590 770 520 770 C440 770 360 710 360 600 C360 500 430 470 450 380 C480 440 500 470 520 470 C530 400 500 330 520 260 Z" fill="url(#flame)"/>
+  <!-- 影片卡 -->
+  <g transform="translate(860 200)">
+    <rect width="560" height="300" rx="28" fill="#ffffff" stroke="#1a1a1a" stroke-width="5"/>
+    <circle cx="280" cy="150" r="60" fill="#2d5db3" stroke="#1a1a1a" stroke-width="5"/>
+    <path d="M262 120 L310 150 L262 180 Z" fill="#ffffff"/>
+  </g>
+  <!-- 測驗卡 -->
+  <g transform="translate(860 540)">
+    <rect width="560" height="270" rx="28" fill="#ffffff" stroke="#1a1a1a" stroke-width="5"/>
+    <text class="t" x="40" y="70">Q1 · 這支影片的重點是？</text>
+    <rect x="40" y="105" width="480" height="56" rx="28" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+    <rect class="ok" x="40" y="180" width="480" height="56" rx="28" fill="#61b675" fill-opacity=".35" stroke="#1a1a1a" stroke-width="2"/>
+    <text class="m" x="70" y="143">A. 收藏就好</text>
+    <text class="m" x="70" y="218">B. 消化成自己的知識 ✓</text>
+  </g>
+</svg>
