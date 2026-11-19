@@ -23,7 +23,7 @@ const projects = defineCollection({
       .array(z.object({ src: z.string(), alt: bi, caption: bi, phone: z.boolean().default(false) }))
       .optional(),
     // 說明區塊裡的流程圖元件
-    diagram: z.enum(['eia', 'gesture']).optional(),
+    diagram: z.enum(['eia', 'gesture', 'kinect']).optional(),
     role: biList,
     stack: z.array(z.string()),
     highlights: biList.optional(),

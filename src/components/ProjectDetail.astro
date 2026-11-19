@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import { ui, path, type Lang } from '../i18n/ui';
 import EiaFlow from './diagrams/EiaFlow.astro';
 import GestureFlow from './diagrams/GestureFlow.astro';
+import KinectFlow from './diagrams/KinectFlow.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -102,8 +103,10 @@ const wideShots = (d.gallery ?? []).filter((g) => !g.phone);
           )}
           {d.diagram && (
             <div class="diagram">
-              <h3 class="h3">{d.diagram === 'eia' ? t.detail.flowEia : t.detail.flowGesture}</h3>
-              {d.diagram === 'eia' ? <EiaFlow lang={lang} /> : <GestureFlow lang={lang} />}
+              <h3 class="h3">{t.detail.flow[d.diagram]}</h3>
+              {d.diagram === 'eia' && <EiaFlow lang={lang} />}
+              {d.diagram === 'gesture' && <GestureFlow lang={lang} />}
+              {d.diagram === 'kinect' && <KinectFlow lang={lang} />}
             </div>
           )}
         </section>

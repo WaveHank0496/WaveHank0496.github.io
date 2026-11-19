@@ -1,0 +1,290 @@
+---
+// Kinect 雙人演奏：感測器 → 轉送程式 → Unity 兩條演奏路線（依 Juzz-and-chord 的 KinectUdpSender 與 Unity 腳本整理）
+import type { Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const zh = lang === 'zh';
+
+const top = [
+  {
+    n: 'Kinect v2',
+    d: zh ? '同時追蹤兩個人的骨架' : 'Tracks two skeletons at once',
+    c: 'w',
+  },
+  {
+    n: 'KinectUdpSender',
+    tag: 'C# / .NET',
+    d: zh
+      ? '取 8 個關節＋左右手開合；左邊的人是 0 號、右邊是 1 號，鎖在追蹤編號上，離開再回來就接回位置最近的那一號'
+      : 'Reads 8 joints plus hand open/closed; the left person is slot 0, the right is slot 1, locked to tracking IDs, and a returning player is re-pinned to the nearest slot',
+    c: 'b',
+  },
+  {
+    n: 'UDP',
+    tag: zh ? '每幀 219 bytes' : '219 bytes / frame',
+    d: zh ? '自訂二進位封包：標頭、序號、時間戳＋2 位玩家 × 8 個關節' : 'Custom binary packet: header, sequence, timestamp + 2 players × 8 joints',
+    c: 'w',
+  },
+  {
+    n: 'KinectUdpReceiver',
+    tag: 'Unity',
+    d: zh ? '解封包、攤平資料，不管誰是鼓手' : 'Decodes and exposes the data; does not care who plays what',
+    c: 'y',
+  },
+];
+
+const drum = [
+  { t: zh ? '靜止 2 秒校準' : 'Hold still 2 s to calibrate', d: zh ? '之後的動作都相對於站好時的姿勢' : 'Later motion is relative to the starting pose' },
+  { t: zh ? '手腳碰到鼓' : 'Hands and feet hit drums', d: zh ? '手要握拳才算打；腳踩大鼓與 hi-hat 踏板' : 'A hand only counts when it is a fist; feet work the kick and hi-hat pedals' },
+  { t: zh ? '播放鼓聲取樣' : 'Play drum samples', d: zh ? '每顆鼓／鈸各自的音檔' : 'Each drum and cymbal has its own sample' },
+];
+const chord = [
+  { t: zh ? '平滑關節' : 'Smooth joints', d: zh ? 'EMA 加上死區，手不動時讀起來就是不動' : 'EMA plus a deadband so a still hand reads as still' },
+  { t: zh ? '手臂指向哪一格' : 'Which segment the arm points at', d: zh ? '依肩寬正規化；邊界有遲滯，不會閃來閃去' : 'Normalized by shoulder width; hysteresis at boundaries stops flicker' },
+  { t: zh ? '左手選根音、右手選和弦性質' : 'Left hand picks the root, right hand the quality', d: zh ? '握拳＝彈出／停止' : 'Fist = play / stop' },
+  { t: zh ? '即時合成' : 'Real-time synthesis', d: zh ? '2 個鋸齒波＋脈衝波 → 低通 → ADSR，12 聲複音，tanh 軟削波' : '2 saws + pulse → low-pass → ADSR, 12 voices, tanh soft clipping' },
+];
+---
+
+<figure class="kflow">
+  <ol class="row">
+    {
+      top.map((m) => (
+        <li class:list={['node', m.c]}>
+          <span class="nname">{m.n}</span>
+          {m.tag && <span class="ntag">{m.tag}</span>}
+          <span class="ndesc">{m.d}</span>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="split" aria-hidden="true">
+    <span class="branch"></span>
+  </div>
+
+  <div class="lanes">
+    <section class="lane drum">
+      <h4 class="lane-h">
+        <span class="chip y">{zh ? '0 號玩家' : 'Player 0'}</span>
+        {zh ? '鼓手' : 'Drummer'}
+      </h4>
+      <ol class="steps">
+        {drum.map((s) => (
+          <li>
+            <strong>{s.t}</strong>
+            <span>{s.d}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+    <section class="lane chord">
+      <h4 class="lane-h">
+        <span class="chip p">{zh ? '1 號玩家' : 'Player 1'}</span>
+        {zh ? '和弦手' : 'Chord player'}
+      </h4>
+      <ol class="steps">
+        {chord.map((s) => (
+          <li>
+            <strong>{s.t}</strong>
+            <span>{s.d}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+
+  <figcaption class="note">
+    {zh
+      ? '鼓和和弦是兩個 Unity 場景，執行時疊在同一個世界裡。角色亂掉時按空白鍵，Unity 會透過另一個 UDP 埠通知轉送程式重新定位。'
+      : 'Drums and chords are two Unity scenes loaded into one world at runtime. If roles get mixed up, pressing space makes Unity tell the sender to relocalize over a second UDP port.'}
+  </figcaption>
+</figure>
+
+<style>
+  .kflow {
+    margin: 0;
+    padding: 24px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .row {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 0.8fr 1.6fr 1.1fr 1.1fr;
+    gap: 24px;
+  }
+  .node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 12px;
+    border: 2.5px solid var(--ink);
+    border-radius: 16px;
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .node.b { background: var(--blue); color: #ffffff; }
+  .node.y { background: var(--yellow); }
+  .node:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -21px;
+    width: 16px;
+    height: 12px;
+    transform: translateY(-50%);
+    background: var(--text);
+    clip-path: polygon(0 35%, 55% 35%, 55% 0, 100% 50%, 55% 100%, 55% 65%, 0 65%);
+  }
+  .nname {
+    font-family: var(--font-display);
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  .ntag {
+    align-self: flex-start;
+    padding: 0 8px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .ndesc {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* 從 Receiver 分成兩條線 */
+  .split {
+    position: relative;
+    height: 34px;
+  }
+  .branch {
+    position: absolute;
+    /* 左端落在鼓手欄中間，右端在 Receiver 正下方（也在和弦手欄內） */
+    left: 25%;
+    right: 13%;
+    top: 12px;
+    height: 22px;
+    border: 3px solid var(--text);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+  }
+  .branch::before {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: -15px;
+    width: 3px;
+    height: 12px;
+    background: var(--text);
+  }
+
+  .lanes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .lane {
+    padding: 16px;
+    border: 2.5px solid var(--ink);
+    border-radius: 18px;
+    color: var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .lane.drum { background: var(--yellow); }
+  .lane.chord { background: var(--pink); }
+  .lane-h {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: 18px;
+  }
+  .lane-h .chip {
+    font-family: var(--font-body);
+    font-size: 12px;
+    background: var(--cream);
+  }
+  .steps {
+    margin: 0;
+    padding: 0 0 0 22px;
+    display: grid;
+    gap: 10px;
+  }
+  .steps li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .steps li::marker {
+    font-weight: 900;
+  }
+  .steps strong {
+    font-size: 15px;
+  }
+  .note {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 2px dashed var(--soft-line);
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 1100px) {
+    .row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .node:nth-child(2)::after {
+      content: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .kflow {
+      padding: 18px 14px;
+    }
+    .row {
+      grid-template-columns: 1fr;
+    }
+    .node:not(:last-child)::after,
+    .node:nth-child(2)::after {
+      content: '';
+      left: 50%;
+      right: auto;
+      top: auto;
+      bottom: -21px;
+      width: 12px;
+      height: 16px;
+      transform: translateX(-50%);
+      clip-path: polygon(35% 0, 65% 0, 65% 55%, 100% 55%, 50% 100%, 0 55%, 35% 55%);
+    }
+    .lanes {
+      grid-template-columns: 1fr;
+    }
+    .branch {
+      left: 50%;
+      right: auto;
+      width: 0;
+      border-width: 0 0 0 3px;
+      border-radius: 0;
+    }
+    .branch::before {
+      content: none;
+    }
+  }
+</style>
