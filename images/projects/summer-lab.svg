@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="bg" cx="60%" cy="40%" r="80%">
+      <stop offset="0" stop-color="#2d5db3"/>
+      <stop offset="0.6" stop-color="#2d5db3"/>
+      <stop offset="1" stop-color="#2d5db3"/>
+    </radialGradient>
+    <style>
+      .e{stroke:#fff6d6;stroke-opacity:.6;stroke-width:3}
+      .n{fill:#ffffff;stroke:#1a1a1a;stroke-width:5}
+      .flow{stroke:#ffd201;stroke-width:5;stroke-dasharray:14 26;animation:flow 1.6s linear infinite}
+      .cell{fill:#ffffff;stroke:#1a1a1a;stroke-width:4}
+      .hot{fill:#ffd201;animation:glow 2.5s ease-in-out infinite}
+      .t{font:600 32px ui-monospace,Consolas,monospace;fill:#fff6d6}
+      @keyframes flow{to{stroke-dashoffset:-80}}
+      @keyframes glow{0%,100%{opacity:.35}50%{opacity:1}}
+      @media (prefers-reduced-motion:reduce){.flow,.hot{animation:none}}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <!-- tensor 方格 -->
+  <g transform="translate(150 260)">
+    <rect class="cell" x="0" y="0" width="90" height="90" rx="14"/><rect class="cell" x="100" y="0" width="90" height="90" rx="14"/><rect class="cell hot" x="200" y="0" width="90" height="90" rx="14"/>
+    <rect class="cell" x="0" y="100" width="90" height="90" rx="14"/><rect class="cell hot" x="100" y="100" width="90" height="90" rx="14" style="animation-delay:.8s"/><rect class="cell" x="200" y="100" width="90" height="90" rx="14"/>
+    <rect class="cell hot" x="0" y="200" width="90" height="90" rx="14" style="animation-delay:1.6s"/><rect class="cell" x="100" y="200" width="90" height="90" rx="14"/><rect class="cell" x="200" y="200" width="90" height="90" rx="14"/>
+    <text class="t" x="0" y="370">np.ndarray</text>
+  </g>
+  <!-- 神經網路 -->
+  <g>
+    <line class="e" x1="700" y1="300" x2="1000" y2="250"/><line class="e" x1="700" y1="300" x2="1000" y2="450"/><line class="e" x1="700" y1="300" x2="1000" y2="650"/>
+    <line class="e" x1="700" y1="500" x2="1000" y2="250"/><line class="e" x1="700" y1="500" x2="1000" y2="450"/><line class="e" x1="700" y1="500" x2="1000" y2="650"/>
+    <line class="e" x1="700" y1="700" x2="1000" y2="250"/><line class="e" x1="700" y1="700" x2="1000" y2="450"/><line class="e" x1="700" y1="700" x2="1000" y2="650"/>
+    <line class="e" x1="1000" y1="250" x2="1300" y2="380"/><line class="e" x1="1000" y1="450" x2="1300" y2="380"/><line class="e" x1="1000" y1="650" x2="1300" y2="380"/>
+    <line class="e" x1="1000" y1="250" x2="1300" y2="580"/><line class="e" x1="1000" y1="450" x2="1300" y2="580"/><line class="e" x1="1000" y1="650" x2="1300" y2="580"/>
+    <line class="flow" x1="700" y1="500" x2="1000" y2="450"/><line class="flow" x1="1000" y1="450" x2="1300" y2="380"/>
+    <circle class="n" cx="700" cy="300" r="34"/><circle class="n" cx="700" cy="500" r="34"/><circle class="n" cx="700" cy="700" r="34"/>
+    <circle class="n" cx="1000" cy="250" r="34"/><circle class="n" cx="1000" cy="450" r="34"/><circle class="n" cx="1000" cy="650" r="34"/>
+    <circle class="n" cx="1300" cy="380" r="34" style="fill:#fe8aa3"/><circle class="n" cx="1300" cy="580" r="34"/>
+    <text class="t" x="1000" y="800" text-anchor="middle">torch.nn.Module</text>
+  </g>
+</svg>
