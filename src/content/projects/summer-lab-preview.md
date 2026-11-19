@@ -5,6 +5,13 @@ title:
 summary:
   zh: "暑假的自學紀錄：從 NumPy 陣列操作一路練到 CNN 分類器與遷移學習。"
   en: "Summer self-study: from NumPy array basics to CNN classifiers and transfer learning."
+story:
+  zh:
+    - "為了準備進實驗室，我在 2026 暑假自己從頭補機器學習的基礎，一個主題一個 notebook。"
+    - "NumPy 做了 10 個主題的練習加上一份期末練習；PyTorch 從 tensor 和 autograd 開始，一路做到自己寫 CNN 分類器，最後用 ResNet 在 CIFAR 上做遷移學習，每個階段都搭配自我測驗。同一個暑假稍後做的 Gesture Demo，模型就是用 PyTorch 自己訓練的。"
+  en:
+    - "To prepare for joining a lab, I rebuilt my machine-learning foundations from scratch over summer 2026, one notebook per topic."
+    - "For NumPy I worked through 10 topics plus a final exercise. For PyTorch I went from tensors and autograd to writing my own CNN classifier, then transfer learning with ResNet on CIFAR, with self-tests at each stage. Later that summer I trained the model for Gesture Demo myself in PyTorch."
 tier: 3
 featured: false
 order: 9

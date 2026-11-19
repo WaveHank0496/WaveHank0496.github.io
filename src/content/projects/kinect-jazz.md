@@ -5,6 +5,15 @@ title:
 summary:
   zh: "用一台 Kinect v2 讓兩個人同時站在感測器前，不碰實體樂器就能合奏：一人打鼓、一人彈和弦。"
   en: "One Kinect v2 lets two people play together without touching an instrument: one on air drums, the other on chords."
+story:
+  zh:
+    - "多媒體課程的期末專題。我們想做一個不用碰任何樂器、兩個人就能合奏的體驗：兩個人站在同一台 Kinect 前，一個用拳頭打空氣鼓、用腳踩大鼓；另一個用手指向畫面上的兩個輪盤選和弦，握拳就彈出聲音。"
+    - "我負責 Unity 這一端：判斷動作、追蹤兩位玩家、處理聲音。最麻煩的是兩人共用一台感測器，只要有人走動或互相擋到，Kinect 就可能把兩個人的身分對調，鼓手突然變成和弦手。我的做法是先依站的位置分配角色，第一次同時看到兩人時就把角色綁定在 Kinect 給的追蹤編號上；追蹤中斷再出現時，接回離上次位置最近的角色，真的亂掉也可以按空白鍵重新定位。"
+    - "和弦的聲音沒有用任何音檔，是在 Unity 裡逐個取樣即時合成的：兩個微微走音的鋸齒波加一個脈衝波，經過低通濾波和音量包絡，最多 12 個音同時發聲，再用軟削波避免爆音。Kinect 的骨架資料則由一支小程式打包成 UDP 封包送進 Unity。"
+  en:
+    - "Final project for a multimedia course. We wanted two people to play music together without touching an instrument: both stand in front of one Kinect; one plays air drums with closed fists and kicks the bass drum with a foot, while the other points at two on-screen wheels to choose a chord and closes a fist to play it."
+    - "I handled the Unity side: gesture logic, tracking both players, and audio. The hardest part was sharing one sensor. Whenever someone moved or blocked the other, Kinect could swap their identities and the drummer would suddenly become the chord player. I assign roles by position, lock them to Kinect's tracking IDs the first time both players are visible, and when a player is lost and reappears, reattach them to the nearest previous position. If it still goes wrong, the space bar recalibrates."
+    - "The chords use no audio files at all; they are synthesized sample by sample inside Unity from two slightly detuned saw waves and a pulse wave, run through a low-pass filter and volume envelope, with up to 12 notes at once and soft clipping to avoid distortion. Skeleton data from Kinect is packed into UDP packets by a small helper program and sent to Unity."
 tier: 2
 featured: false
 order: 5

@@ -63,6 +63,17 @@ const t = ui[lang];
       </div>
     </dl>
 
+    {
+      d.story && (
+        <section class="block reveal">
+          <h2 class="h2 h2-story">{t.detail.story}</h2>
+          <div class="story">
+            {d.story[lang].map((p) => <p>{p}</p>)}
+          </div>
+        </section>
+      )
+    }
+
     <section class="block reveal">
       <h2 class="h2">{t.detail.role}</h2>
       <ul class="list">{d.role[lang].map((r) => <li>{r}</li>)}</ul>
@@ -208,6 +219,26 @@ const t = ui[lang];
     font-weight: 900;
     font-size: clamp(18px, 2.2vw, 22px);
   }
+  .h2-story {
+    background: var(--yellow);
+  }
+  .story {
+    max-width: 820px;
+    padding: 26px 30px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .story p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.9;
+    color: var(--text);
+  }
+  .story p + p {
+    margin-top: 1em;
+  }
   .list {
     margin: 0;
     padding: 22px 26px 22px 46px;
@@ -291,6 +322,12 @@ const t = ui[lang];
     }
     .list {
       padding: 16px 16px 16px 34px;
+    }
+    .story {
+      padding: 18px;
+    }
+    .story p {
+      font-size: 16px;
     }
     .challenge {
       grid-template-columns: 1fr;

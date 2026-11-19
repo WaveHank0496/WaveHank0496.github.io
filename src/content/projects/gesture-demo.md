@@ -5,6 +5,15 @@ title:
 summary:
   zh: "用攝影機即時辨識 15 種手勢並觸發互動（捏合、抓取拖曳、畫筆、圖片音效），自己錄資料、自己訓練模型。"
   en: "Recognizes 15 hand gestures from a webcam in real time and drives interactions (pinch, grab-and-drag, drawing, image and sound triggers), with a self-collected dataset and a self-trained model."
+story:
+  zh:
+    - "我想做一個不用滑鼠、只靠手勢就能操作的互動 demo：捏合、抓住東西拖曳、在空中畫畫、觸發圖片和音效。一開始用手寫的幾何規則判斷手勢，但手稍微轉個角度就判錯，所以我決定自己錄資料、自己訓練模型。"
+    - "我錄了 15 種手勢、共 33,809 筆資料，訓練一個小型神經網路，測試準確率 95.73%。這個專案我最在意的是「數字要可信」：影片裡相鄰的畫面幾乎一樣，如果隨機切分訓練和測試資料，分數會虛高，所以我以整段錄影為單位切分；同樣的指令跑兩次，結果差了 1%，我就把所有隨機來源固定住，讓每次訓練的結果完全相同，並自動記錄當次的設定和資料版本。"
+    - "接著我看混淆矩陣找出最常被搞混的三個手勢，針對它們補錄資料，F1 從 0.73／0.79／0.83 提升到 0.97／1.00／0.99。比讚（thumb_up）的召回率目前仍只有 0.75，這個弱點我也照實記錄下來。程式架構上，鏡頭、偵測、平滑、辨識、互動、繪圖各自獨立，所以從規則式換成模型時只改了一個檔案，兩種辨識方式還能在執行中即時切換比較。"
+  en:
+    - "I wanted an interactive demo you control with your hands instead of a mouse: pinch, grab and drag objects, draw in the air, trigger images and sounds. My first version used hand-written geometric rules, which broke as soon as the hand rotated, so I decided to record my own data and train my own model."
+    - "I recorded 33,809 samples across 15 gestures and trained a small neural network that reaches 95.73% test accuracy. What I cared about most was that the number can be trusted. Neighboring video frames are nearly identical, so a random train/test split inflates the score; I split by whole recording instead. Two identical runs differed by 1%, so I fixed every source of randomness until training was exactly reproducible, and every run now logs its settings and data version."
+    - "Then I used the confusion matrix to find the three most-confused gestures and recorded more data for them, raising F1 from 0.73/0.79/0.83 to 0.97/1.00/0.99. Thumbs-up recall is still only 0.75, and I documented that weakness openly. Camera, detection, smoothing, recognition, interaction and rendering are separate modules, so switching from rules to the model changed a single file, and both recognizers can be swapped live for comparison."
 tier: 1
 featured: true
 order: 3
@@ -21,21 +30,21 @@ stack: ["Python", "PyTorch", "MediaPipe", "OpenCV", "scikit-learn", "pygame"]
 highlights:
   zh:
     - "15 類手勢、測試準確率 95.73%、自錄 33,809 筆資料"
-    - "模組化管線 camera → detector → smoother → recognizer → interaction → renderer，模組之間只靠資料契約溝通"
-    - "規則式與 ML 兩種辨識器可即時切換對比"
-    - "誠實記錄限制：thumb_up recall 只有 0.75"
+    - "管線 camera → detector → smoother → recognizer → interaction → renderer，每個模組只透過固定格式的資料溝通，換掉一個不影響其他"
+    - "規則式與 ML 兩種辨識器可在執行中即時切換比較"
+    - "已知弱點：比讚（thumb_up）的召回率只有 0.75"
   en:
     - "15 gesture classes, 95.73% test accuracy, 33,809 self-recorded samples"
-    - "Modular pipeline camera → detector → smoother → recognizer → interaction → renderer, connected only through data contracts"
+    - "Pipeline camera → detector → smoother → recognizer → interaction → renderer; modules talk only through fixed data formats, so one can be replaced without touching the rest"
     - "Rule-based and ML recognizers can be switched live for side-by-side comparison"
-    - "Limitations documented honestly: thumb_up recall is only 0.75"
+    - "Known weakness: thumbs-up recall is only 0.75"
 challenges:
   - problem:
       zh: "手寫幾何規則對手的角度很敏感，比讚時手一轉就判錯。"
       en: "Hand-written geometric rules break as soon as the hand rotates (for example, a thumbs-up)."
     solution:
-      zh: "改用自己訓練的 MLP 分類器。因為架構用資料契約隔離，替換時只改 recognizer 一個檔案，其他模組一行都沒動。"
-      en: "Replaced them with a self-trained MLP classifier. Thanks to contract-based isolation, only the recognizer file changed; no other module was touched."
+      zh: "改用自己訓練的 MLP 分類器。因為模組之間分得很乾淨，替換時只改了 recognizer 一個檔案，其他模組一行都沒動。"
+      en: "Replaced them with a self-trained MLP classifier. Because the modules are cleanly separated, only the recognizer file changed; no other module was touched."
   - problem:
       zh: "手在畫面的位置與遠近不同，特徵差很多；深度座標雜訊又大。"
       en: "Hand position and distance change the features a lot, and the depth coordinate is noisy."

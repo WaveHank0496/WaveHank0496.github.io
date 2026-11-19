@@ -5,6 +5,15 @@ title:
 summary:
   zh: "串連宜蘭東澳 10 家在地商家的集點活動：掃店家 QR 蓋章，集滿 3 家用扭蛋機兌換，附東澳飛魚主題小遊戲。"
   en: "A stamp-rally system connecting 10 local shops in Dong'ao, Yilan: scan a shop's QR code to collect a stamp, collect 3 to redeem a capsule-toy prize, plus a flying-fish mini game."
+story:
+  zh:
+    - "這個專案從課程作業開始，最後真的在宜蘭東澳上線。目的是把遊客帶進當地 10 家小店：在店家掃 QR code 蓋章，集滿 3 家就能到扭蛋機換獎品，網站上還有一個東澳飛魚主題的小遊戲。活動期間累積 1,657 次瀏覽、420 人次參與集點。"
+    - "因為真的有人在用、而且有獎品可以換，我花最多心力的地方是「怎麼不被作弊」。點數一律由後端重新計算，前端傳來的數字一個都不信；兌換用的 QR code 經過 AES-256-GCM 加密並帶有簽發時間，截圖轉傳或重複使用都會被擋下；API 有依 IP 的速率限制和輸入檢查。我也自己寫了一份威脅模型，列出 SSRF、CORS、偽造兌換這些風險，以及哪些風險我評估後選擇接受。"
+    - "後端整個跑在 Cloudflare Workers 上，沒有自己的伺服器要維護。另外也處理了很多到現場才會碰到的問題：很多人是從 LINE 或 Facebook 點連結進來，內建瀏覽器的行為不一樣，所以要偵測並提示；換手機的人可以用卡號找回進度；網站也有英文版。"
+  en:
+    - "This started as a course project and ended up running for real in Dong'ao, Yilan. The goal was to bring visitors into 10 local shops: scan a shop's QR code to get a stamp, collect 3 and redeem a prize from a capsule-toy machine, with a flying-fish mini game on the site. During the event it had 1,657 views and 420 stamp-rally participations."
+    - "Because real people used it and there were real prizes, most of my effort went into preventing cheating. Stamps are always recounted on the backend and nothing the client sends is trusted. Redemption QR codes are encrypted with AES-256-GCM and carry an issue time, so screenshots and replays are rejected. The API has per-IP rate limits and input checks. I also wrote my own threat model covering SSRF, CORS and forged redemptions, including which risks I chose to accept and why."
+    - "The backend runs entirely on Cloudflare Workers, with no server to maintain. I also handled problems that only show up in the field: many people open the link inside LINE or Facebook, whose in-app browsers behave differently, so the site detects them and shows a hint; people who switch phones can restore progress with their card number; and the site has an English version."
 tier: 1
 featured: true
 order: 2

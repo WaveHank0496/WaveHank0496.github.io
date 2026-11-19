@@ -5,6 +5,15 @@ title:
 summary:
   zh: "Android app：在 Instagram、YouTube 連續滑超過設定時間，就跳出全螢幕的貓問你要不要繼續。全程在手機上處理，沒有網路權限。"
   en: "An Android app that interrupts long scrolling sessions on Instagram or YouTube with a full-screen cat asking whether to keep going. Fully on-device, with no network permission."
+story:
+  zh:
+    - "麥勾滑要解決的是「沒意識到自己一直在滑」：在 Instagram 或 YouTube 連續滑超過你設定的時間，畫面就會跳出一隻全螢幕的貓，問你還要不要繼續。這個 app 我自己每天都在用。"
+    - "這類 app 最常失敗的原因是兩個禮拜後使用者就習慣了，提示一跳出來就反射性地按掉。所以我刻意設計互動：停下來只要按一下，想繼續滑要按住 2 秒，「我在傳訊息」的按鈕形狀和位置都不一樣，避免手指記住位置。提示文案也有根據：我整理了 4 份心理學文獻，其中一份專門找反面證據，結果發現網路上常見的「滑 10 分鐘就該停」查不到實證，我就把這類說法拿掉。"
+    - "它會知道你在用哪些 app，所以隱私是底線：app 完全沒有網路權限，資料不會離開手機。我用測試把這件事鎖住，只要加了網路相關套件或開了備份，測試就會失敗。計時邏輯寫成不依賴 Android 的獨立狀態機，有 231 個單元測試；後來我又讓 4 個 AI 子代理分別檢查 4 層架構，找出 62 個問題、分 4 批修完。在 OPPO Reno7 實機上過夜跑 9 小時，沒有中斷。"
+  en:
+    - "mindgohua targets scrolling without noticing: after you scroll Instagram or YouTube past a limit you set, a full-screen cat appears and asks whether you want to keep going. I use it every day myself."
+    - "Apps like this usually fail because after two weeks people dismiss the prompt by reflex. So the interaction is deliberate: stopping takes one tap, continuing takes a 2-second hold, and the 'I'm texting' button has a different shape and position so your thumb cannot memorize it. The copy is grounded too: I reviewed 4 psychology sources, one dedicated to counter-evidence, found no support for the popular 'stop after 10 minutes' rule, and removed claims like it."
+    - "The app knows which apps you use, so privacy is non-negotiable: it has no network permission and nothing leaves the phone. Tests lock this in; adding a networking library or enabling backups makes them fail. The timing logic is a standalone state machine with no Android dependency and 231 unit tests. Later I had 4 AI sub-agents audit the 4 architecture layers, found 62 issues and fixed them in 4 batches. It ran overnight for 9 hours on an OPPO Reno7 without stopping."
 tier: 2
 featured: false
 order: 4

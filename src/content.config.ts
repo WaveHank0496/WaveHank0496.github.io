@@ -16,6 +16,8 @@ const projects = defineCollection({
     date: bi,
     sortDate: z.coerce.date(),
     status: bi.optional(),
+    // 詳細頁開頭的白話說明：為什麼做、做了什麼、難在哪（每個元素一段）
+    story: biList.optional(),
     role: biList,
     stack: z.array(z.string()),
     highlights: biList.optional(),

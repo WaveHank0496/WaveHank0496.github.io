@@ -5,6 +5,13 @@ title:
 summary:
   zh: "用動畫一步步呈現 6 種排序演算法，也能並排比較兩種演算法。"
   en: "Animates 6 sorting algorithms step by step and lets you compare two side by side."
+story:
+  zh:
+    - "一個單頁網頁，用動畫一步一步播放 6 種排序演算法。可以暫停、單步前進、調整速度，也能把兩種演算法並排比較；畫面上會即時顯示比較次數、交換次數和時間複雜度。"
+    - "做法是先把排序過程中的每一次比較與交換記錄下來，再依序播放成動畫，並用顏色區分已排序和未排序的區段。沒有用任何框架，只用 HTML、CSS、JavaScript。"
+  en:
+    - "A single-page site that animates 6 sorting algorithms step by step. You can pause, step forward, change speed and compare two algorithms side by side, with live counts of comparisons and swaps and each algorithm's time complexity."
+    - "It records every comparison and swap first, then replays them as an animation, coloring sorted and unsorted regions. No framework, just HTML, CSS and JavaScript."
 tier: 3
 featured: false
 order: 8

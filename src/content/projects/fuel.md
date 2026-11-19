@@ -5,6 +5,15 @@ title:
 summary:
   zh: "反囤積的學習工具：貼上 YouTube 連結，由 Gemini 產生測驗與摘要，搭配槽位限制與養成寵物機制，逼自己真正消化收藏的影片。"
   en: "An anti-hoarding learning tool: paste a YouTube link and Gemini generates a quiz and summary, with slot limits and a pet system that push you to actually digest saved videos."
+story:
+  zh:
+    - "「稍後觀看」清單只會越來越長。Fuel 把收藏的影片當成要燒掉的「資訊脂肪」：貼上 YouTube 連結，程式自動抓字幕，Gemini 出一份理解測驗和摘要，答過測驗才算真的消化。"
+    - "為了讓人不要繼續囤積，我用遊戲規則取代提醒：一次最多只能放 5 支影片，放進「煉獄區」的影片 24 小時內沒處理就會自動銷毀；還有一隻浣熊寵物，狀態會跟著你的學習進度變化。"
+    - "最早是終端機版本，之後做了桌面版（CustomTkinter）和網頁版（FastAPI＋Alpine.js）。原本規劃接著做 Telegram 和 LINE Bot，目前暫停開發。"
+  en:
+    - "Watch-later lists only grow. Fuel treats saved videos as info-fat to burn: paste a YouTube link, the app pulls the transcript, Gemini writes a comprehension quiz and summary, and a video only counts once you have taken the quiz."
+    - "To stop hoarding, I used game rules instead of reminders: you can hold at most 5 videos, anything left in the 'purgatory' area for 24 hours self-destructs, and a raccoon pet's mood follows your learning progress."
+    - "It began as a terminal app, then got a desktop version (CustomTkinter) and a web version (FastAPI + Alpine.js). Telegram and LINE bots were next on the roadmap; development is currently paused."
 tier: 2
 featured: false
 order: 6
