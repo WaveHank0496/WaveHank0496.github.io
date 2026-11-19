@@ -14,6 +14,16 @@ story:
     - "This started as a course project and ended up running for real in Dong'ao, Yilan. The goal was to bring visitors into 10 local shops: scan a shop's QR code to get a stamp, collect 3 and redeem a prize from a capsule-toy machine, with a flying-fish mini game on the site. During the event it had 1,657 views and 420 stamp-rally participations."
     - "Because real people used it and there were real prizes, most of my effort went into preventing cheating. Stamps are always recounted on the backend and nothing the client sends is trusted. Redemption QR codes are encrypted with AES-256-GCM and carry an issue time, so screenshots and replays are rejected. The API has per-IP rate limits and input checks. I also wrote my own threat model covering SSRF, CORS and forged redemptions, including which risks I chose to accept and why."
     - "The backend runs entirely on Cloudflare Workers, with no server to maintain. I also handled problems that only show up in the field: many people open the link inside LINE or Facebook, whose in-app browsers behave differently, so the site detects them and shows a hint; people who switch phones can restore progress with their card number; and the site has an English version."
+gallery:
+  - src: "/images/projects/eia-card.webp"
+    phone: true
+    alt:
+      zh: "東澳集點卡畫面，10 家店家各有一個手繪章"
+      en: "The Dong'ao stamp card, with a hand-drawn stamp for each of the 10 shops"
+    caption:
+      zh: "集點卡：10 家店家各有一個章，蓋到的會變色，集滿 3 家就能換扭蛋。"
+      en: "The stamp card: each of the 10 shops has its own stamp, which lights up once collected; any 3 earn a capsule."
+diagram: eia
 tier: 1
 featured: true
 order: 2

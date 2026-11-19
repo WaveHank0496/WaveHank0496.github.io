@@ -28,6 +28,8 @@ export const ui = {
     detail: {
       back: '← 回專案列表',
       story: '這個專案',
+      flowEia: '系統流程：從掃碼到扭蛋機出球',
+      flowGesture: '模型與架構：從攝影機到畫面',
       role: '我負責的部分',
       highlights: '成果與重點',
       stack: '技術',
@@ -69,6 +71,8 @@ export const ui = {
     detail: {
       back: '← Back to projects',
       story: 'About this project',
+      flowEia: 'System flow: from scanning to a capsule',
+      flowGesture: 'Model and architecture: from camera to screen',
       role: 'My Role',
       highlights: 'Results & Highlights',
       stack: 'Tech Stack',

@@ -14,6 +14,7 @@ story:
     - "I wanted an interactive demo you control with your hands instead of a mouse: pinch, grab and drag objects, draw in the air, trigger images and sounds. My first version used hand-written geometric rules, which broke as soon as the hand rotated, so I decided to record my own data and train my own model."
     - "I recorded 33,809 samples across 15 gestures and trained a small neural network that reaches 95.73% test accuracy. What I cared about most was that the number can be trusted. Neighboring video frames are nearly identical, so a random train/test split inflates the score; I split by whole recording instead. Two identical runs differed by 1%, so I fixed every source of randomness until training was exactly reproducible, and every run now logs its settings and data version."
     - "Then I used the confusion matrix to find the three most-confused gestures and recorded more data for them, raising F1 from 0.73/0.79/0.83 to 0.97/1.00/0.99. Thumbs-up recall is still only 0.75, and I documented that weakness openly. Camera, detection, smoothing, recognition, interaction and rendering are separate modules, so switching from rules to the model changed a single file, and both recognizers can be swapped live for comparison."
+diagram: gesture
 tier: 1
 featured: true
 order: 3

@@ -18,6 +18,12 @@ const projects = defineCollection({
     status: bi.optional(),
     // 詳細頁開頭的白話說明：為什麼做、做了什麼、難在哪（每個元素一段）
     story: biList.optional(),
+    // 說明區塊裡的截圖（phone: 直式手機畫面，顯示得窄一點）
+    gallery: z
+      .array(z.object({ src: z.string(), alt: bi, caption: bi, phone: z.boolean().default(false) }))
+      .optional(),
+    // 說明區塊裡的流程圖元件
+    diagram: z.enum(['eia', 'gesture']).optional(),
     role: biList,
     stack: z.array(z.string()),
     highlights: biList.optional(),

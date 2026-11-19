@@ -1,0 +1,335 @@
+---
+// Gesture Demo：每一幀的模組管線＋辨識器內部的模型（依 Gesture_demo 的 src/gesture_demo/*.py 整理）
+import type { Lang } from '../../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const zh = lang === 'zh';
+
+const modules = [
+  { n: 'camera', d: zh ? '讀攝影機影格' : 'Read webcam frames', c: 'w' },
+  { n: 'detector', d: zh ? 'MediaPipe 抓出手的 21 個關節點' : 'MediaPipe finds 21 hand keypoints', c: 'w' },
+  { n: 'smoother', d: zh ? 'EMA 平滑，減少抖動' : 'EMA smoothing to reduce jitter', c: 'w' },
+  { n: 'recognizer', d: zh ? '判斷是哪個手勢（下方展開）' : 'Decides the gesture (expanded below)', c: 'y' },
+  { n: 'interaction', d: zh ? '1 捏合觸發・2 抓取拖曳・3 畫筆・4 圖片音效' : '1 pinch · 2 grab & drag · 3 draw · 4 image & sound', c: 'w' },
+  { n: 'renderer', d: zh ? '把骨架和效果畫回畫面' : 'Draws the skeleton and effects', c: 'w' },
+];
+
+// MLP 示意：每層畫幾顆點（實際數字寫在下方標籤）
+const layers = [
+  { size: 42, dots: 7, label: zh ? '輸入' : 'input' },
+  { size: 128, dots: 9, label: zh ? '隱藏層' : 'hidden' },
+  { size: 64, dots: 7, label: zh ? '隱藏層' : 'hidden' },
+  { size: 15, dots: 5, label: zh ? '手勢' : 'gestures' },
+];
+const W = 360;
+const H = 240;
+const colX = layers.map((_, i) => 40 + i * ((W - 80) / (layers.length - 1)));
+const dotY = (count: number, j: number) => {
+  const span = 150;
+  const top = (H - 56 - span) / 2 + 8;
+  return count === 1 ? H / 2 : top + (span * j) / (count - 1);
+};
+const fills = ['var(--cream)', 'var(--blue)', 'var(--blue)', 'var(--pink)'];
+---
+
+<figure class="gflow">
+  <p class="label">{zh ? '每一幀依序經過 6 個模組' : 'Every frame passes through 6 modules'}</p>
+  <ol class="pipe">
+    {
+      modules.map((m) => (
+        <li class:list={['mod', m.c]}>
+          <code class="mname">{m.n}</code>
+          <span class="mdesc">{m.d}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="contract">
+    {zh
+      ? '模組之間只傳三種固定格式的資料（HandLandmarks、GestureState、RenderCommand），所以把規則換成模型時，只改了 recognizer 一個檔案。'
+      : 'Modules pass only three fixed data types (HandLandmarks, GestureState, RenderCommand), so replacing rules with a model changed only the recognizer file.'}
+  </p>
+
+  <div class="zoom">
+    <p class="label zl">{zh ? 'recognizer 裡面：自己訓練的分類模型' : 'Inside the recognizer: a self-trained classifier'}</p>
+    <div class="inner">
+      <div class="box">
+        <strong>{zh ? '21 個關節點' : '21 keypoints'}</strong>
+        <span>(x, y, z)</span>
+      </div>
+      <span class="arr" aria-hidden="true"></span>
+      <div class="box">
+        <strong>{zh ? '正規化' : 'Normalize'}</strong>
+        <span>{zh ? '減去手腕座標、除以手掌長度；z 雜訊太大，丟掉' : 'Subtract the wrist, divide by palm length; drop noisy z'}</span>
+      </div>
+      <span class="arr" aria-hidden="true"></span>
+      <div class="box mlp">
+        <strong>MLP</strong>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="MLP 42 → 128 → 64 → 15">
+          {layers.slice(0, -1).map((l, i) =>
+            Array.from({ length: l.dots }).map((_, a) =>
+              Array.from({ length: layers[i + 1].dots }).map((_, b) => (
+                <line
+                  x1={colX[i]}
+                  y1={dotY(l.dots, a)}
+                  x2={colX[i + 1]}
+                  y2={dotY(layers[i + 1].dots, b)}
+                  class="edge"
+                />
+              )),
+            ),
+          )}
+          {layers.map((l, i) =>
+            Array.from({ length: l.dots }).map((_, j) => (
+              <circle cx={colX[i]} cy={dotY(l.dots, j)} r="7.5" style={`fill:${fills[i]}`} class="node" />
+            )),
+          )}
+          {layers.map((l, i) => (
+            <>
+              <text x={colX[i]} y={H - 30} class="size">{l.size}</text>
+              <text x={colX[i]} y={H - 8} class="lname">{l.label}</text>
+            </>
+          ))}
+        </svg>
+        <span>{zh ? '兩層隱藏層都用 ReLU' : 'ReLU on both hidden layers'}</span>
+      </div>
+      <span class="arr" aria-hidden="true"></span>
+      <div class="box">
+        <strong>{zh ? '信心夠嗎？' : 'Confident?'}</strong>
+        <span>{zh ? '最高機率 ≥ 0.7 才輸出手勢，否則當作沒有手勢' : 'Output a gesture only if the top probability ≥ 0.7, otherwise none'}</span>
+      </div>
+    </div>
+    <p class="fallback">
+      {zh
+        ? '按 m 可以切回手寫規則即時比較；模型權重載入失敗時，也會自動退回規則。'
+        : 'Press m to switch back to hand-written rules for a live comparison; if the model weights fail to load, it falls back to rules automatically.'}
+    </p>
+  </div>
+
+  <div class="train">
+    <span class="chip y">{zh ? '自錄 33,809 筆、15 類' : '33,809 self-recorded samples, 15 classes'}</span>
+    <span class="tarr" aria-hidden="true">→</span>
+    <span class="chip w">{zh ? '以整段錄影分層切分' : 'Stratified split by recording session'}</span>
+    <span class="tarr" aria-hidden="true">→</span>
+    <span class="chip w">Adam・lr 0.001・40 epochs</span>
+    <span class="tarr" aria-hidden="true">→</span>
+    <span class="chip g">{zh ? '測試準確率 95.73%' : '95.73% test accuracy'}</span>
+  </div>
+</figure>
+
+<style>
+  .gflow {
+    margin: 0;
+    padding: 24px;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--hard-sm);
+  }
+  .label {
+    margin: 0 0 14px;
+    font-weight: 900;
+    font-size: 15px;
+  }
+  .pipe {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 22px;
+  }
+  .mod {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 10px;
+    border: 2.5px solid var(--ink);
+    border-radius: 16px;
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .mod.y {
+    background: var(--yellow);
+    transform: translateY(-4px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .mod:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    width: 16px;
+    height: 12px;
+    transform: translateY(-50%);
+    background: var(--text);
+    clip-path: polygon(0 35%, 55% 35%, 55% 0, 100% 50%, 55% 100%, 55% 65%, 0 65%);
+  }
+  .mname {
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .mdesc {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .contract {
+    margin: 16px 0 0;
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+
+  .zoom {
+    margin-top: 22px;
+    padding: 18px;
+    border: 2.5px dashed var(--yellow);
+    border-radius: 18px;
+  }
+  .inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1.2fr auto 1.9fr auto 1.2fr;
+    align-items: center;
+    gap: 10px;
+  }
+  .box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 12px;
+    border: 2.5px solid var(--ink);
+    border-radius: 16px;
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .box strong {
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .box.mlp {
+    background: #ffffff;
+  }
+  .box svg {
+    width: 100%;
+    height: auto;
+  }
+  .edge {
+    stroke: var(--ink);
+    stroke-opacity: 0.18;
+    stroke-width: 1;
+  }
+  .node {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .size {
+    font-family: var(--font-display);
+    font-size: 21px;
+    text-anchor: middle;
+    fill: var(--ink);
+  }
+  .lname {
+    font-size: 15px;
+    font-weight: 700;
+    text-anchor: middle;
+    fill: var(--ink);
+    opacity: 0.7;
+  }
+  .arr {
+    width: 16px;
+    height: 12px;
+    background: var(--text);
+    clip-path: polygon(0 35%, 55% 35%, 55% 0, 100% 50%, 55% 100%, 55% 65%, 0 65%);
+  }
+  .fallback {
+    margin: 14px 0 0;
+    font-size: 13.5px;
+    color: var(--text-soft);
+  }
+
+  .train {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 2px dashed var(--soft-line);
+  }
+  .train .chip {
+    font-size: 13px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .tarr {
+    font-weight: 900;
+  }
+
+  @media (max-width: 1100px) {
+    .pipe {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .mod:nth-child(3)::after {
+      content: none;
+    }
+  }
+  @media (max-width: 860px) {
+    .inner {
+      grid-template-columns: 1fr;
+    }
+    .arr {
+      justify-self: center;
+      width: 12px;
+      height: 16px;
+      clip-path: polygon(35% 0, 65% 0, 65% 55%, 100% 55%, 50% 100%, 0 55%, 35% 55%);
+    }
+    .box.mlp svg {
+      max-width: 360px;
+      align-self: center;
+    }
+  }
+  @media (max-width: 640px) {
+    .gflow {
+      padding: 18px 14px;
+    }
+    .pipe {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .mod::after,
+    .mod:nth-child(3)::after {
+      content: none;
+    }
+    .mod:not(:last-child)::after {
+      content: '';
+      left: 50%;
+      right: auto;
+      top: auto;
+      bottom: -21px;
+      width: 12px;
+      height: 16px;
+      transform: translateX(-50%);
+      clip-path: polygon(35% 0, 65% 0, 65% 55%, 100% 55%, 50% 100%, 0 55%, 35% 55%);
+    }
+    .mod.y {
+      transform: none;
+    }
+    .zoom {
+      padding: 14px 12px;
+    }
+    .train {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .tarr {
+      transform: rotate(90deg);
+      margin-left: 14px;
+    }
+  }
+</style>

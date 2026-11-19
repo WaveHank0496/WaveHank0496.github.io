@@ -2,6 +2,8 @@
 import type { CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { ui, path, type Lang } from '../i18n/ui';
+import EiaFlow from './diagrams/EiaFlow.astro';
+import GestureFlow from './diagrams/GestureFlow.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -10,6 +12,9 @@ interface Props {
 const { project, lang } = Astro.props;
 const d = project.data;
 const t = ui[lang];
+// 直式手機截圖放在說明文字旁邊；橫式的放在下方
+const phoneShots = (d.gallery ?? []).filter((g) => g.phone);
+const wideShots = (d.gallery ?? []).filter((g) => !g.phone);
 ---
 
 <Base lang={lang} route={`/projects/${project.id}`} title={d.title[lang]} description={d.summary[lang]}>
@@ -67,9 +72,40 @@ const t = ui[lang];
       d.story && (
         <section class="block reveal">
           <h2 class="h2 h2-story">{t.detail.story}</h2>
-          <div class="story">
-            {d.story[lang].map((p) => <p>{p}</p>)}
+          <div class:list={['story-wrap', { 'has-side': phoneShots.length > 0 }]}>
+            <div class="story">
+              {d.story[lang].map((p) => <p>{p}</p>)}
+            </div>
+            {phoneShots.map((g) => (
+              <figure class="shot phone side">
+                <img src={g.src} alt={g.alt[lang]} loading="lazy" />
+                <figcaption>{g.caption[lang]}</figcaption>
+              </figure>
+            ))}
           </div>
+        </section>
+      )
+    }
+
+    {
+      (wideShots.length > 0 || d.diagram) && (
+        <section class="block visual reveal">
+          {wideShots.length > 0 && (
+            <div class="gallery">
+              {wideShots.map((g) => (
+                <figure class:list={['shot', { phone: g.phone }]}>
+                  <img src={g.src} alt={g.alt[lang]} loading="lazy" />
+                  <figcaption>{g.caption[lang]}</figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
+          {d.diagram && (
+            <div class="diagram">
+              <h3 class="h3">{d.diagram === 'eia' ? t.detail.flowEia : t.detail.flowGesture}</h3>
+              {d.diagram === 'eia' ? <EiaFlow lang={lang} /> : <GestureFlow lang={lang} />}
+            </div>
+          )}
         </section>
       )
     }
@@ -222,6 +258,12 @@ const t = ui[lang];
   .h2-story {
     background: var(--yellow);
   }
+  .story-wrap.has-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 28px;
+    align-items: start;
+  }
   .story {
     max-width: 820px;
     padding: 26px 30px;
@@ -238,6 +280,43 @@ const t = ui[lang];
   }
   .story p + p {
     margin-top: 1em;
+  }
+  .visual {
+    margin-top: 28px;
+    display: grid;
+    gap: 28px;
+  }
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .shot {
+    margin: 0;
+    flex: 1 1 320px;
+    max-width: 100%;
+  }
+  .shot.phone {
+    flex: 0 1 300px;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    box-shadow: var(--hard-sm);
+    background: #ffffff;
+  }
+  .shot figcaption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+  .h3 {
+    margin: 0 0 14px;
+    font-family: var(--font-display);
+    font-size: 19px;
   }
   .list {
     margin: 0;
@@ -308,6 +387,12 @@ const t = ui[lang];
     color: var(--text-soft);
   }
   @media (max-width: 860px) {
+    .story-wrap.has-side {
+      grid-template-columns: 1fr;
+    }
+    .shot.side {
+      max-width: 300px;
+    }
     .meta {
       grid-template-columns: 1fr;
     }
