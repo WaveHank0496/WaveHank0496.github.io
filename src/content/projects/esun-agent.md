@@ -13,8 +13,8 @@ date:
   en: "Fall 2026 (in progress)"
 sortDate: 2026-10-19
 status:
-  zh: "參賽中"
-  en: "Competing"
+  zh: "參賽中・11/11 全國第 4"
+  en: "Competing · #4 on Nov 11"
 role:
   zh:
     - "3 人團隊中唯一的開發者，全部程式由我開發；兩位金融背景隊友負責領域知識與策略規則"
@@ -29,10 +29,12 @@ role:
 stack: ["Python", "Gemini API", "Google Cloud Run", "Cloud Scheduler", "Cloud Monitoring", "Backtesting"]
 highlights:
   zh:
+    - "11/11（第 12／24 交易日）累積報酬排名全國第 4（409 隊，社會組＋學生組合併），學生組第 3（318 隊），當天名次上升 56 名"
     - "一條管線串起官方資料下載、9 種資料蒐集、訊號計算、Gemini 決策、規則修正、合規檢查、後台檢核、送出與通知信"
     - "技術分數與籌碼分數用 tanh 壓到 −1～1，綜合分數 = 0.7 × 技術 + 0.3 × 籌碼，權重依回測決定"
     - "題材選擇：16 份獨立 AI 作答投票（半數盲測、Borda 計分、規則事先鎖定），選出 PCB 為主、塑化為輔"
   en:
+    - "On Nov 11 (trading day 12 of 24), ranked #4 nationwide by cumulative return among 409 teams (open + student divisions) and #3 of 318 student teams, up 56 places that day"
     - "One pipeline: official data download, 9 data sources, signal scoring, Gemini decisions, rule correction, compliance checks, backend validation, submission and email notification"
     - "Technical and chip-flow scores squashed into −1…1 with tanh; composite = 0.7 × technical + 0.3 × chips, weights chosen by backtest"
     - "Theme selection by voting over 16 independent AI answers (half blind, Borda count, rules locked in advance): PCB as core, plastics as satellite"
